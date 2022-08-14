@@ -2,7 +2,8 @@
 
 ## Project Description
 This service created for simple calculation of country land routes. Routing endpoint returns when if it can find a possible route from origin to destination country.
-Given county data link is https://raw.githubusercontent.com/mledoze/countries/master/countries.json
+
+Given county data link is: https://raw.githubusercontent.com/mledoze/countries/master/countries.json
 
 ## How to Install and Run the Project
 ### Requirements
