@@ -3,6 +3,7 @@ package com.demo.landroutecalculator.controller;
 import com.demo.landroutecalculator.model.LandRouteCalculateDto;
 import com.demo.landroutecalculator.service.RouteCalculateService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ public class RouteCalculateController {
         this.routeCalculateService = routeCalculateService;
     }
 
+    @Cacheable(value="routeInfo", key = "new org.springframework.cache.interceptor.SimpleKey(#originCountry, #destinationCountry)")
     @GetMapping("/routing/{originCountry}/{destinationCountry}")
     public ResponseEntity<LandRouteCalculateDto> getLandRoutes(@PathVariable String originCountry, @PathVariable String destinationCountry) {
         LandRouteCalculateDto landRouteCalculateDto = routeCalculateService.calculateLandRoute(originCountry, destinationCountry);

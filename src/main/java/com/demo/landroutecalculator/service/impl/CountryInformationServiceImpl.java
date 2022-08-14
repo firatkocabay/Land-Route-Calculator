@@ -42,6 +42,7 @@ public class CountryInformationServiceImpl implements CountryInformationService 
         }
     }
 
+    @Cacheable(value = "relatedCountryBorders", key = "#relatedCountry")
     @Override
     public List<String> getRelatedCountryBorders(String relatedCountry) {
         log.info("Calling service for country of: {}", relatedCountry);
@@ -57,6 +58,7 @@ public class CountryInformationServiceImpl implements CountryInformationService 
         return countryBorders;
     }
 
+    @Cacheable(value = "countryBordersWithoutDisabledCountries", key = "new org.springframework.cache.interceptor.SimpleKey(#relatedCountry, #disabledCountryBorders)")
     @Override
     public List<String> getRelatedCountryBorders(String relatedCountry, List<String> disabledCountryBorders) {
         log.info("disabledCountryBorders: {}", disabledCountryBorders);
