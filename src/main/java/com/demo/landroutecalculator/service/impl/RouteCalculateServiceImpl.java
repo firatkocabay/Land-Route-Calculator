@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -79,9 +80,18 @@ public class RouteCalculateServiceImpl implements RouteCalculateService {
         }
 
         if (route.contains(destinationCountry)) {
-            landRouteCalculateDto.setRoute(route);
+            landRouteCalculateDto.setRoute(removeDuplicates(route));
         }
         return landRouteCalculateDto;
+    }
+
+    private List<String> removeDuplicates(List<String> list) {
+        log.info("Before remove duplicates: {}", list);
+        Set<String> set = new LinkedHashSet<>(list);
+        list.clear();
+        list.addAll(set);
+        log.info("After remove duplicates: {}", list);
+        return list;
     }
 
 }
