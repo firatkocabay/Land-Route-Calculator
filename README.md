@@ -10,6 +10,8 @@ JDK 8
 
 Docker
 
+Maven 3
+
 ### Installation
 You should run this command on project home directory:
 
@@ -17,10 +19,20 @@ docker build -t springio/gs-spring-boot-docker .
 
 This command builds an image and tags it as 'springio/gs-spring-boot-docker'
 
+#### Alternative Installation
+You can run this command on project home directory:
+
+mvn clean install
+
 ### Run Project
 You should run this command:
 
 docker run -p 8080:8080 springio/gs-spring-boot-docker
+
+#### Alternative Run Project
+You can run this command:
+
+java -jar LandRouteCalculator-0.0.1-SNAPSHOT.jar
 
 ### Test
 You can test with this curl command:
