@@ -6,7 +6,9 @@ import com.demo.landroutecalculator.service.RouteCalculateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -54,38 +56,36 @@ public class RouteCalculateServiceImpl implements RouteCalculateService {
             return landRouteCalculateDto;
         }
 
-        try {
-            calculateRouteUsingLandBorders(route, originCountry, destinationCountry, originCountryBorders, landRouteCalculateDto);
-        } catch (Exception e) {
-            log.info("Info message: {}", e.getMessage());
-            landRouteCalculateDto.setRoute(route);
-        }
+        calculateRouteUsingLandBorders(route, originCountry, destinationCountry, originCountryBorders, landRouteCalculateDto);
 
         return landRouteCalculateDto;
     }
 
     private LandRouteCalculateDto calculateRouteUsingLandBorders(List<String> route,
-                                                String originCountry,
-                                                String destinationCountry,
-                                                List<String> originCountryBorders,
-                                                LandRouteCalculateDto landRouteCalculateDto) {
+                                                                 String originCountry,
+                                                                 String destinationCountry,
+                                                                 List<String> originCountryBorders,
+                                                                 LandRouteCalculateDto landRouteCalculateDto) {
         log.info("Route List 1: {}", route);
-        if (route.contains(destinationCountry)) {
-            landRouteCalculateDto.setRoute(route);
-            throw new RuntimeException("A Route Find");
-        } else {
-            originCountryBorders.forEach(border -> {
-                route.add(border);
-                log.info("Route List 2: {}", route);
-                List<String> neighborCountryLandBorders = countryInformationService.getRelatedCountryBorders(border, route);
-                if (neighborCountryLandBorders.isEmpty() && !route.contains(destinationCountry)) {
-                    route.remove(border);
-                    return;
-                }
-                this.calculateRouteUsingLandBorders(route, originCountry, destinationCountry, neighborCountryLandBorders, landRouteCalculateDto);
-            });
-            return landRouteCalculateDto;
+
+        for (int i = 0; i < originCountryBorders.size(); i++) {
+            if (route.contains(destinationCountry)) {
+                log.info("route contain destinationCountry!");
+                landRouteCalculateDto.setRoute(route);
+                break;
+            }
+            String border = originCountryBorders.get(i);
+            route.add(border);
+            log.info("Route List 2: {}", route);
+            List<String> neighborCountryLandBorders = countryInformationService.getRelatedCountryBorders(border, route);
+            if (neighborCountryLandBorders.isEmpty() && !route.contains(destinationCountry)) {
+                route.remove(border);
+                continue;
+            }
+            this.calculateRouteUsingLandBorders(route, originCountry, destinationCountry, neighborCountryLandBorders, landRouteCalculateDto);
         }
+
+        return landRouteCalculateDto;
     }
 
 }
