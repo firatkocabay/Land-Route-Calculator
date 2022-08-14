@@ -25,8 +25,9 @@ public class RouteCalculateServiceImpl implements RouteCalculateService {
         LandRouteCalculateDto landRouteCalculateDto = new LandRouteCalculateDto();
         List<String> originCountryBorders = countryInformationService.getRelatedCountryBorders(originCountry);
         List<String> route = new ArrayList<>(new LinkedHashSet<>());
+        landRouteCalculateDto.setRoute(new ArrayList<>());
 
-        if (checkCountryBorderAndIsSameCountry(originCountry, destinationCountry, landRouteCalculateDto, originCountryBorders, route))
+        if (checkCountryBorderSizeWithIsSameCountry(originCountry, destinationCountry, landRouteCalculateDto, originCountryBorders, route))
             return landRouteCalculateDto;
 
         route.add(originCountry);
@@ -36,14 +37,11 @@ public class RouteCalculateServiceImpl implements RouteCalculateService {
 
         List<String> destinationCountryBorders = countryInformationService.getRelatedCountryBorders(destinationCountry);
         calculateBasicLandRoute(destinationCountry, landRouteCalculateDto, originCountryBorders, route, destinationCountryBorders);
-        if (route.contains(destinationCountry)) return landRouteCalculateDto;
-
-        calculateRouteUsingLandBorders(route, destinationCountry, originCountryBorders, destinationCountryBorders, landRouteCalculateDto);
 
         return landRouteCalculateDto;
     }
 
-    private boolean checkCountryBorderAndIsSameCountry(String originCountry, String destinationCountry, LandRouteCalculateDto landRouteCalculateDto, List<String> originCountryBorders, List<String> route) {
+    private boolean checkCountryBorderSizeWithIsSameCountry(String originCountry, String destinationCountry, LandRouteCalculateDto landRouteCalculateDto, List<String> originCountryBorders, List<String> route) {
         if (originCountryBorders.isEmpty() || originCountry.equals(destinationCountry)) {
             landRouteCalculateDto.setRoute(route);
             return true;
@@ -61,45 +59,28 @@ public class RouteCalculateServiceImpl implements RouteCalculateService {
     }
 
     private LandRouteCalculateDto calculateBasicLandRoute(String destinationCountry, LandRouteCalculateDto landRouteCalculateDto, List<String> originCountryBorders, List<String> route, List<String> destinationCountryBorders) {
-        originCountryBorders.forEach(originBorder -> destinationCountryBorders.forEach(destinationBorder -> {
-            if (originBorder.equals(destinationBorder) && !route.contains(destinationCountry)) {
-                log.info("Contains neighbor border land country of {}", originBorder);
-                route.add(originBorder);
-                route.add(destinationCountry);
-                landRouteCalculateDto.setRoute(route);
+        for (String originBorder : originCountryBorders) {
+            for (String destinationBorder : destinationCountryBorders) {
+                if (originBorder.equals(destinationBorder) && !route.contains(destinationCountry)) {
+                    route.add(originBorder);
+                    route.add(destinationCountry);
+                } else {
+                    List<String> borderCountryBorders = countryInformationService.getRelatedCountryBorders(originBorder, route);
+                    if (!borderCountryBorders.isEmpty()) {
+                        if (!route.contains(destinationCountry)) {
+                            route.add(originBorder);
+                            calculateBasicLandRoute(destinationCountry, landRouteCalculateDto, borderCountryBorders, route, destinationCountryBorders);
+                        }
+                        else
+                            break;
+                    }
+                }
             }
-        }));
+        }
 
         if (route.contains(destinationCountry)) {
-            return landRouteCalculateDto;
+            landRouteCalculateDto.setRoute(route);
         }
-        return landRouteCalculateDto;
-    }
-
-    private LandRouteCalculateDto calculateRouteUsingLandBorders(List<String> route,
-                                                                 String destinationCountry,
-                                                                 List<String> originCountryBorders,
-                                                                 List<String> destinationCountryBorders,
-                                                                 LandRouteCalculateDto landRouteCalculateDto) {
-        log.info("Route List 1: {}", route);
-
-        for (int i = 0; i < originCountryBorders.size(); i++) {
-            if (route.contains(destinationCountry)) {
-                log.info("route contain destinationCountry!");
-                landRouteCalculateDto.setRoute(route);
-                break;
-            }
-            String border = originCountryBorders.get(i);
-            route.add(border);
-            log.info("Route List 2: {}", route);
-            List<String> neighborCountryLandBorders = countryInformationService.getRelatedCountryBorders(border, route);
-            if (neighborCountryLandBorders.isEmpty() && !route.contains(destinationCountry)) {
-                route.remove(border);
-                continue;
-            }
-            this.calculateRouteUsingLandBorders(route, destinationCountry, neighborCountryLandBorders, destinationCountryBorders, landRouteCalculateDto);
-        }
-
         return landRouteCalculateDto;
     }
 
