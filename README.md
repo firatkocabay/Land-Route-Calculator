@@ -31,9 +31,9 @@ You should run this command:
 docker run -p 8080:8080 springio/gs-spring-boot-docker
 
 #### Alternative Run Project
-You can run this command:
+You can run this command on project home directory:
 
-java -jar LandRouteCalculator-0.0.1-SNAPSHOT.jar
+java -jar target/LandRouteCalculator-0.0.1-SNAPSHOT.jar
 
 ### Test
 You can test with this curl command:
