@@ -68,4 +68,20 @@ public class CountryInformationServiceImpl implements CountryInformationService 
         return relatedCountryAllBorders;
     }
 
+    @Cacheable(value = "relatedCountryLatitudeLongitude", key = "#relatedCountry")
+    @Override
+    public List<Double> getRelatedCountryLatitudeLongitude(String relatedCountry) {
+        log.info("Calling LatitudeLongitude for country of: {}", relatedCountry);
+        if (countryPropertiesResponse == null) {
+            throw new CountryPropertiesNotFound("Country properties not found of given country: " + relatedCountry);
+        }
+        List<Double> countryBorders = new ArrayList<>();
+        for (CountryPropertiesResponse res : countryPropertiesResponse) {
+            if (res.getCountryName().equals(relatedCountry)) {
+                countryBorders.addAll(res.getLatitudeLongitude());
+            }
+        }
+        return countryBorders;
+    }
+
 }

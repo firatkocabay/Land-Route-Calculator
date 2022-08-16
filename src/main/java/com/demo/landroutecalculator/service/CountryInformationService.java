@@ -8,4 +8,6 @@ public interface CountryInformationService {
 
     List<String> getRelatedCountryBorders(String relatedCountry, List<String> disabledCountryBorders);
 
+    List<Double> getRelatedCountryLatitudeLongitude(String relatedCountry);
+
 }

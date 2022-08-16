@@ -18,4 +18,7 @@ public class CountryPropertiesResponse {
     @JsonProperty("borders")
     private List<String> countryBorders;
 
+    @JsonProperty("latlng")
+    private List<Double> latitudeLongitude;
+
 }
